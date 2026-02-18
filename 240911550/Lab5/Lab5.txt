@@ -1,0 +1,42 @@
+1. Retrieve the birth date and address of the employee(s) whose name is ‘John B. 
+Smith’. Retrieve the name and address of all employees who work for the 
+‘Research’ department.  
+
+SELECT Bdate,Address FROM Employee WHERE Fname='John' AND Minit='B' and Lname='Smith';
+SELECT E.Fname, E.Minit, E.Lname, E.Address FROM EMPLOYEE E JOIN DEPARTMENT D ON E.Dno = D.Dnumber WHERE D.Dname = 'Research';
+
+2. For every project located in ‘Stanford’, list the project number, the controlling  
+department number, and the department manager’s last name, address, and birth 
+date. 
+
+SELECT P.Pnumber,P.Dnum,E.Lname,E.Address,E.Bdate FROM PROJECT P JOIN Employee E on E.Dno=P.Dnum WHERE P.Plocation='Stanford';
+
+3. For each employee, retrieve the employee’s first and last name and the first and 
+last name of his or her immediate supervisor. 
+
+SELECT E.Fname, E.Lname, S.Fname, S.Lname FROM Employee E LEFT JOIN Employee S ON E.Super_ssn=S.S
+sn;
+
+4. Make a list of all project numbers for projects that involve an employee whose 
+last name is ‘Smith’, either as a worker or as a manager of the department that 
+controls the project.  
+
+SELECT DISTINCT P.Pnumber FROM Project P JOIN Works_On W ON P.Pnumber=W.Pno JOIN Employee E1 ON W
+.Essn=E1.Ssn JOIN Department D ON P.Dnum = D.Dnumber JOIN Employee E2 ON D.Mgr_ssn = E2.Ssn WHERE E1.Lname = 'Smith' OR E2.Lname = 'Smith';
+
+5. Show the resulting salaries if every employee working on the ‘ProductX’ project 
+is given a 10 percent raise.  
+
+SELECT E.Fname, E.Lname,
+       E.Salary AS Original_Salary,
+       E.Salary * 1.10 AS New_Salary
+FROM Employee E
+JOIN Works_On W ON E.Ssn = W.Essn
+JOIN Project P ON W.Pno = P.Pnumber
+WHERE P.Pname = 'ProductX';
+
+6. 
+
+
+
+
