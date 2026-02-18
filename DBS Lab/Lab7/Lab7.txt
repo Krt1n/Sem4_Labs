@@ -1,0 +1,253 @@
+create table StudentTable(RollNo int, GPA number(4,2));
+insert into StudentTable values (1,5.8);
+insert into StudentTable values (2,6.5);
+insert into StudentTable values (3,3.4);
+insert into StudentTable values (4,7.8);
+insert into StudentTable values (5,9.5);
+
+1. Write a PL/SQL block to display the GPA of given student. 
+declare 
+	s_rollno StudentTable.RollNo%TYPE:= &RollNo;
+	s_gpa StudentTable.GPA%TYPE;
+begin
+	SELECT GPA INTO s_gpa FROM StudentTable WHERE RollNo = s_rollno;
+	DBMS_output.put_line('GPA of student ' || s_rollno || ' is ' || s_gpa);
+EXCEPTION WHEN NO_DATA_FOUND THEN
+	DBMS_output.put_line('No student found with RollNo' || s_rollno);
+END;
+
+
+2. Write a PL/SQL block to display the letter grade(0-4: F; 4-5: E; 5-6: D; 6-7: C;               
+7-8: B; 8-9: A; 9-10: A+} of given student.
+
+declare
+	s_rollno StudentTable.RollNo%TYPE:= &RollNo;
+	s_gpa StudentTable.GPA%TYPE;
+begin 
+	SELECT GPA INTO s_gpa from StudentTable where RollNo = s_rollno;
+
+	IF s_gpa>=9 AND s_gpa<=10 THEN
+		DBMS_OUTPUT.put_line('Student Grade is A+');
+	ELSIF s_gpa>=8 AND s_gpa<9 THEN
+		DBMS_OUTPUT.put_line('Student Grade is A');
+	ELSIF s_gpa>=7 AND s_gpa<8 THEN
+		DBMS_OUTPUT.put_line('Student Grade is B');
+	ELSIF s_gpa>=6 AND s_gpa<7 THEN
+		DBMS_OUTPUT.put_line('Student Grade is C');
+	ELSIF s_gpa>=5 AND s_gpa<6 THEN
+		DBMS_OUTPUT.put_line('Student Grade is D');
+	ELSIF s_gpa>=4 AND s_gpa<5 THEN
+		DBMS_OUTPUT.put_line('Student Grade is E');
+	ELSIF s_gpa>=0 AND s_gpa<4 THEN
+		DBMS_OUTPUT.put_line('Student Grade is F');
+	ELSE  
+  		DBMS_OUTPUT.PUT_LINE('No such grade');
+	END IF;
+END;	
+
+3. Input the date of issue and date of return for a book. Calculate and display the fine with the appropriate message using a PL/SQL block. The fine is charged as per 
+the table 8.1.
+
+declare 
+	issue_date DATE:= TO_DATE('&issue_date','DD-MM-YYYY');
+	return_date DATE:= TO_DATE('&return_date','DD-MM-YYYY');
+	late_days NUMBER;
+	fine NUMBER:=0;
+BEGIN
+	late_days := return_date - issue_date;
+	
+	IF late_days <=7 THEN
+		fine:=0;
+		dbms_output.put_line('No fine');
+	ELSIF late_days>=8 AND late_days<=15 THEN
+		fine:= late_days * 1;
+		dbms_output.put_line('Fine in Rs :' || fine);
+	ELSIF late_days>=16 AND late_days<=30 THEN
+		fine:= late_days * 2;
+		dbms_output.put_line('Fine in Rs :' || fine);
+	ELSE
+		fine:= 5;
+		dbms_output.put_line('Fine in Rs :' || fine);
+	END IF;
+END;
+
+4. Write a PL/SQL block to print the letter grade of all the students(RollNo: 1 - 5). 
+DECLARE 
+  s_rollno StudentTable.RollNo%TYPE;
+  s_gpa    StudentTable.GPA%TYPE;
+  i        NUMBER := 1;
+BEGIN
+  LOOP
+    s_rollno := i;
+
+    SELECT GPA INTO s_gpa
+    FROM StudentTable
+    WHERE RollNo = s_rollno;
+
+    IF s_gpa >= 9 AND s_gpa <= 10 THEN
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade A+');
+    ELSIF s_gpa >= 8 AND s_gpa < 9 THEN
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade A');
+    ELSIF s_gpa >= 7 AND s_gpa < 8 THEN
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade B');
+    ELSIF s_gpa >= 6 AND s_gpa < 7 THEN
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade C');
+    ELSIF s_gpa >= 5 AND s_gpa < 6 THEN
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade D');
+    ELSIF s_gpa >= 4 AND s_gpa < 5 THEN
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade E');
+    ELSE
+      DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ': Grade F');
+    END IF;
+
+    i := i + 1;
+
+    IF i > 5 THEN
+      EXIT;
+    END IF;
+  END LOOP;
+END;
+/
+
+5. Alter StudentTable by appending an additional column LetterGrade Varchar2(2).  
+Then write a PL/SQL block  to update the table with letter grade of each student.
+
+ALTER TABLE StudentTable
+ADD LetterGrade VARCHAR2(2);
+
+DECLARE 
+	s_rollno StudentTable.RollNo%TYPE;
+	s_gpa    StudentTable.GPA%TYPE;
+	Grade VARCHAR2(2);
+	i NUMBER := 1;
+BEGIN
+  	WHILE i<=5 LOOP
+	s_rollno :=i;
+	SELECT GPA INTO s_gpa FROM StudentTable WHERE RollNo = s_rollno;
+
+    	IF s_gpa >= 9 AND s_gpa <= 10 THEN
+      		Grade:= 'A+';
+    	ELSIF s_gpa >= 8 AND s_gpa < 9 THEN
+		Grade := 'A';
+    	ELSIF s_gpa >= 7 AND s_gpa < 8 THEN
+		grade := 'B';
+   	ELSIF s_gpa >= 6 AND s_gpa < 7 THEN
+		grade := 'C';    	
+	ELSIF s_gpa >= 5 AND s_gpa < 6 THEN
+      		grade := 'D';
+    	ELSIF s_gpa >= 4 AND s_gpa < 5 THEN
+      		grade := 'E';
+   	ELSE
+      		grade := 'F';
+    	END IF;
+	
+	UPDATE studenttable SET LetterGrade = Grade WHERE RollNo= s_rollno;
+    	i := i + 1;
+	END LOOP;
+END;
+SQL> select * from studenttable;
+
+    ROLLNO        GPA LE
+---------- ---------- --
+         1        5.8 D
+         2        6.5 C
+         3        3.4 F
+         4        7.8 B
+         5        9.5 A+
+
+6. Write a PL/SQL block to find the student with max. GPA without using aggregate 
+function. 
+
+DECLARE
+  s_rollno   StudentTable.RollNo%TYPE;
+  s_gpa      StudentTable.GPA%TYPE;
+  max_rollno StudentTable.RollNo%TYPE;
+  max_gpa    StudentTable.GPA%TYPE := -1; -- initialize with a very low value
+  i          NUMBER := 1;
+BEGIN
+  FOR i IN 1..5 LOOP
+    s_rollno := i;
+
+    SELECT GPA INTO s_gpa FROM StudentTable WHERE RollNo = s_rollno;
+    IF s_gpa > max_gpa THEN
+      max_gpa := s_gpa;
+      max_rollno := s_rollno;
+    END IF;
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE('Student with max GPA: RollNo ' || max_rollno || ', GPA = ' || max_gpa);
+END;
+/
+
+Student with max GPA: RollNo 5, GPA = 9.5
+
+7. Implement lab exercise 4 using GOTO.  
+DECLARE
+  s_rollno StudentTable.RollNo%TYPE;
+  s_gpa    StudentTable.GPA%TYPE;
+  grade    VARCHAR2(2);
+  i        NUMBER := 1;
+BEGIN
+  <<start_loop>>
+  IF i > 5 THEN
+    GOTO end_loop;
+  END IF;
+
+  s_rollno := i;
+  SELECT GPA INTO s_gpa FROM StudentTable WHERE RollNo = s_rollno;
+
+  IF s_gpa >= 9 THEN
+    grade := 'A+';
+  ELSIF s_gpa >= 8 THEN
+    grade := 'A';
+  ELSIF s_gpa >= 7 THEN
+    grade := 'B';
+  ELSIF s_gpa >= 6 THEN
+    grade := 'C';
+  ELSIF s_gpa >= 5 THEN
+    grade := 'D';
+  ELSIF s_gpa >= 4 THEN
+    grade := 'E';
+  ELSE
+    grade := 'F';
+  END IF;
+
+  DBMS_OUTPUT.PUT_LINE('RollNo ' || s_rollno || ' : Grade ' || grade);
+
+  i := i + 1;
+  GOTO start_loop;
+
+  <<end_loop>>
+  DBMS_OUTPUT.PUT_LINE('Finished printing grades.');
+END;
+/
+
+
+8. Based on the University database schema, write a PL/SQL block to display the 
+details of the Instructor whose name is supplied by the user. Use exceptions to 
+show appropriate error message for the following cases:  
+a. Multiple instructors with the same name  
+b. No instructor for the given name    
+
+DECLARE
+  	v_id     Instructor.ID%TYPE;
+	v_name   Instructor.Name%TYPE;
+ 	v_dept   Instructor.DeptName%TYPE;
+BEGIN
+  SELECT ID, Name, DeptName
+  INTO v_id, v_name, v_dept
+  FROM Instructor
+  WHERE Name = '&InstructorName';
+
+  DBMS_OUTPUT.PUT_LINE('Instructor Details:');
+  DBMS_OUTPUT.PUT_LINE('ID: ' || v_id || ', Name: ' || v_name || ', Dept: ' || v_dept);
+
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Error: No instructor found with the given name.');
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('Error: Multiple instructors found with the same name.');
+END;
+/
+
+

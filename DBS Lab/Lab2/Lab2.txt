@@ -1,0 +1,57 @@
+1. Create Employee table with following constraints:  Make EmpNo as Primary key. Do not allow EmpName, Gender, Salary and Address to have null values. Allow Gender to have one of the two values: ‘M’, ‘F’.  
+
+CREATE table Employee(EmpNo int PRIMARY KEY, EmpName varchar(20) NOT NULL, Gender char(1) NOT NULL CHECK(gender='M' or gender='F'), Salary float NOT NULL, Address varchar(20) NOT NULL, DNo int NOT NULL);
+
+2. Create Department table with following: DeptNo as Primary Key. DeptName as candidate key.
+CREATE table Department(DeptNo int PRIMARY KEY, DeptName varchar(20) UNIQUE NOT NULL, Location varchar(20)); 
+
+3. Make DNo of Employee as foreign key which refers to DeptNo of Department.  
+ALTER TABLE Employee ADD CONSTRAINT fk_DNo FOREIGN KEY (DNo) REFERENCES Department(DeptNo);
+
+4. Insert few tuples into Employee and Department which satisfies the above 
+constraints. 
+
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (1,'KRTIN','M','100000','Bangalore',1);
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (2,'NINAD','M','100000','Pune',1);
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (3,'Dev','M','99999','Patna',2);
+
+insert into Department (DeptNo, DeptName, Location) values (1,'CSE','AB5');
+insert into Department (DeptNo, DeptName, Location) values (2,'IT','AB5');
+
+5. Try to insert few tuples into Employee and Department which violates some of the 
+above constraints.  
+
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (1,'Dev','M','99999','Patna',2);
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (3,'Dev','M','99999','Patna',3);
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (4,'Ram','L','100000','Pune',1);
+
+6. Try to modify/delete a tuple which violates a constraint. 
+insert into Employee  (EmpNo, EmpName, Gender, Salary, Address, DNo) values (4,'Ram','M','100000','Pune',1);
+
+7. Modify the foreign key constraint of Employee table such that whenever a department tuple is deleted, the employees belonging to that department will also be deleted. 
+ALTER TABLE Employee DROP CONSTRAINT fk_DNo;
+ALTER TABLE Employee ADD CONSTRAINT fk_DNo FOREIGN KEY (DNo) REFERENCES Department(DeptNo) ON DELETE CASCADE;
+
+8. Create a named constraint to set the default salary to 10000 and test the constraint by         
+inserting a new record. 
+ALTER TABLE Employee MODIFY Salary DEFAULT 10000;
+INSERT INTO Employee (EmpNo, EmpName, Gender, Address, DNo) VALUES (5, 'Anita', 'F', 'Delhi', 2);
+
+9. List all Students with names and their department names. 
+select name,dept_name from Student;
+
+10. List all instructors in CSE department.
+select * from instructor where dept_name='Comp. Sci.';
+
+11. Find the names of courses in CSE department which have 3 credits. 
+select title from course where dept_name='Comp. Sci.' and credits=3;
+
+12. For the student with ID 12345 (or any other value), show all course-id and title of all 
+courses registered for by the student.  
+SELECT T.Course_id, C.Title FROM Takes T, Course C WHERE T.Course_id = C.Course_id AND T.ID = 12345;
+
+13. List all the instructors whose salary is in between 40000 and 90000. Retrieving records from multiple tables:
+SELECT * FROM instructor WHERE salary BETWEEN 40000 AND 90000;
+
+14. Display the IDs of all instructors who have never taught a course. 
+select ID from Instructor where ID 
