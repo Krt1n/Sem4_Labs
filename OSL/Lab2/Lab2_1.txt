@@ -1,0 +1,78 @@
+4ITA2@debian:~/krtin_240911550/Lab2$ date
+Thursday 15 January 2026 03:10:10 PM IST
+4ITA2@debian:~/krtin_240911550/Lab2$ echo 1. Execute all the commands explained in this section and write the output.
+1. Execute all the commands explained in this section and write the output.
+4ITA2@debian:~/krtin_240911550/Lab2$ vi fruits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ grep -E ^p fruits.txt
+pineapple
+papaya
+4ITA2@debian:~/krtin_240911550/Lab2$ grep -v apple fruits.txt 
+orange
+mango
+banana
+grapes
+papaya
+strawberry
+
+4ITA2@debian:~/krtin_240911550/Lab2$ cat fruits.txt
+apple
+orange
+mango
+banana
+pineapple
+grapes
+papaya
+strawberry
+
+4ITA2@debian:~/krtin_240911550/Lab2$ sort -r fruits.txt 
+strawberry
+pineapple
+papaya
+orange
+mango
+grapes
+banana
+apple
+
+4ITA2@debian:~/krtin_240911550/Lab2$ sort -o sortfruits.txt fruits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ cat sortfruits.txt 
+
+apple
+banana
+grapes
+mango
+orange
+papaya
+pineapple
+strawberry
+4ITA2@debian:~/krtin_240911550/Lab2$ wc -l fruits.txt 
+9 fruits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ wc -w fruits.txt 
+8 fruits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ wc -m fruits.txt 
+62 fruits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ sed 's/^apple/IT' fruits.txt
+sed: -e expression #1, char 11: unterminated `s' command
+4ITA2@debian:~/krtin_240911550/Lab2$ ^C
+4ITA2@debian:~/krtin_240911550/Lab2$ sed 's/^apple/IT/' fruits.txt
+IT
+orange
+mango
+banana
+pineapple
+grapes
+papaya
+strawberry
+
+4ITA2@debian:~/krtin_240911550/Lab2$ echo "5/2" | bc -l
+2.50000000000000000000
+4ITA2@debian:~/krtin_240911550/Lab2$ touch sample.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ chmod u=rwx,g=rw,o=r sample.txt 
+4ITA2@debian:~/krtin_240911550/Lab2$ ls -l 
+total 12
+-rw-r--r-- 1 4ITA2 4ITA2  4 Jan 15 15:20 bc
+-rw-r--r-- 1 4ITA2 4ITA2 62 Jan 15 15:07 fruits.txt
+-rwxrw-r-- 1 4ITA2 4ITA2  0 Jan 15 15:21 sample.txt
+-rw-r--r-- 1 4ITA2 4ITA2 62 Jan 15 15:13 sortfruits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ 
+

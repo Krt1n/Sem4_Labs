@@ -1,0 +1,36 @@
+Break - ;;
+* - 0 or more character (default) case
+case -> esac
+if -> fi 
+
+for((i+1;i<N;i++))
+do
+
+done
+
+for i in $Files
+do
+	echo "something"
+done
+
+
+while(())
+do done 
+
+until 
+do -> excutes until the condition is false or while the condition becomes true
+
+IFS - Default is space - we can replace it with in '\n' for any shell commands. 
+
+echo "Enter two numbers"
+read a b
+echo a is $a and b is $b
+c=$((a*b))
+echo $c 
+c= `expr $a \* $b`
+echo $c 
+c=$(echo $a/$b | bc -l)
+
+`# jajdhs
+sdlajd
+lasdhs`

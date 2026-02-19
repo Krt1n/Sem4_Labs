@@ -1,0 +1,13 @@
+4ITA2@debian:~$ ls
+Desktop    Downloads        Music     Public     Videos
+Documents  krtin_240911550  Pictures  Templates
+4ITA2@debian:~$ cd krtin_240911550/
+4ITA2@debian:~/krtin_240911550$ pwd
+/home/4ITA2/krtin_240911550
+4ITA2@debian:~/krtin_240911550$ echo hello
+hello
+4ITA2@debian:~/krtin_240911550$ ls
+Lab1
+4ITA2@debian:~/krtin_240911550$ mkdir Lab2
+4ITA2@debian:~/krtin_240911550$ cd Lab1
+4ITA2@debian:~/krtin_240911550/Lab1$ 

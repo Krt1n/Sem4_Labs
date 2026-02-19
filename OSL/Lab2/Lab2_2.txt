@@ -1,0 +1,45 @@
+4ITA2@debian:~/krtin_240911550/Lab2$ date
+Thursday 15 January 2026 03:52:12 PM IST
+4ITA2@debian:~/krtin_240911550/Lab2$ echo To select the lines from a file that have exactly two characters.
+To select the lines from a file that have exactly two characters.
+4ITA2@debian:~/krtin_240911550/Lab2$ grep -E ^..$ common.txt
+Hi
+A1
+OK
+4ITA2@debian:~/krtin_240911550/Lab2$ echo To select the lines from a file that start with the upper case letter.
+To select the lines from a file that start with the upper case letter.
+4ITA2@debian:~/krtin_240911550/Lab2$ grep -E ^[A-Z] common.txt 
+Hi
+Apple pie
+This is a test line
+End of sentence.
+A1
+NoSpaces
+OK
+Z9 test
+4ITA2@debian:~/krtin_240911550/Lab2$ echo To select the lines from a file that end with a period.
+To select the lines from a file that end with a period.
+4ITA2@debian:~/krtin_240911550/Lab2$ grep -E '\.$' common.txt
+End of sentence.
+4ITA2@debian:~/krtin_240911550/Lab2$ echo To select the lines in a file that has one or more blank spaces.
+To select the lines in a file that has one or more blank spaces.
+4ITA2@debian:~/krtin_240911550/Lab2$ grep ' ' common.txt
+Apple pie
+This is a test line
+End of sentence.
+Z9 test
+4ITA2@debian:~/krtin_240911550/Lab2$ echo To select the lines in a file and direct them to another file which has digits as one of the characters in that line.
+To select the lines in a file and direct them to another file which has digits as one of the characters in that line.
+4ITA2@debian:~/krtin_240911550/Lab2$ grep '[0-9]' common.txt > digits.txt
+4ITA2@debian:~/krtin_240911550/Lab2$ cat digits.txt
+A1
+Z9 test
+4ITA2@debian:~/krtin_240911550/Lab2$ cat common.txt
+Hi
+Apple pie
+This is a test line
+End of sentence.
+A1
+NoSpaces
+OK
+Z9 test

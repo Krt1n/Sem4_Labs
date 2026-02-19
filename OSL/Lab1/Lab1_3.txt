@@ -1,0 +1,20 @@
+4ITA2@debian:~$ cd krtin_240911550/Lab1
+4ITA2@debian:~/krtin_240911550/Lab1$ echo Lab1_3
+Lab1_3
+4ITA2@debian:~/krtin_240911550/Lab1$ date
+Thursday 08 January 2026 03:35:42 PM IST
+4ITA2@debian:~/krtin_240911550/Lab1$ ls *.txt
+file1.txt  file2.txt  Lab1_1.txt  Lab1_2.txt
+4ITA2@debian:~/krtin_240911550/Lab1$ ls [1-9]*.txt
+ls: cannot access '[1-9]*.txt': No such file or directory
+4ITA2@debian:~/krtin_240911550/Lab1$ ls *[1-9]*
+file1.txt  file2.txt  Lab1_1.png  Lab1_1.txt  Lab1_2.txt
+4ITA2@debian:~/krtin_240911550/Lab1$ touch file.txt
+4ITA2@debian:~/krtin_240911550/Lab1$ touch sam
+4ITA2@debian:~/krtin_240911550/Lab1$ ls ????*
+file1.txt  file2.txt  file.txt  Lab1_1.png  Lab1_1.txt  Lab1_2.txt
+4ITA2@debian:~/krtin_240911550/Lab1$ ls [!aeiou]*
+file1.txt  file2.txt  file.txt  Lab1_1.png  Lab1_1.txt  Lab1_2.txt  sam
+4ITA2@debian:~/krtin_240911550/Lab1$ touch aam
+4ITA2@debian:~/krtin_240911550/Lab1$ ls [!aeiou]*
+file1.txt  file2.txt  file.txt  Lab1_1.png  Lab1_1.txt  Lab1_2.txt  sam
