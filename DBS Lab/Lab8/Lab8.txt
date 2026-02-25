@@ -1,0 +1,239 @@
+1.The HRD manager has decided to raise the salary of all the Instructors in a given 
+department number by 5%. Whenever, any such raise is given to the instructor, a 
+record for the same is maintained in the salary_raise table. It includes the Instuctor 
+Id, the date when the raise was given and the actual raise amount. Write a PL/SQL 
+block to update the salary of each Instructor and insert a record in the salary_raise 
+table.  
+
+CREATE TABLE salary_raise
+(
+   Instructor_Id VARCHAR(5),
+   Raise_date    DATE,
+   Raise_amt     NUMBER(8,2)
+);
+DECLARE
+    dname instructor.dept_name%TYPE := 'Comp. Sci.';
+
+    CURSOR c1 IS
+        SELECT ID, salary
+        FROM instructor
+        WHERE dept_name = dname;
+
+    v_id      instructor.ID%TYPE;
+    v_salary  instructor.salary%TYPE;
+    v_raise   instructor.salary%TYPE;
+
+BEGIN
+    OPEN c1;
+
+    LOOP
+        FETCH c1 INTO v_id, v_salary;
+        EXIT WHEN c1%NOTFOUND;
+
+        v_raise := v_salary * 0.05;
+
+        UPDATE instructor
+        SET salary = salary + v_raise
+        WHERE ID = v_id;
+
+        INSERT INTO salary_raise
+        VALUES (v_id, SYSDATE, v_raise);
+
+    END LOOP;
+
+    CLOSE c1;
+
+    COMMIT;
+END;
+/
+
+
+2. Write a PL/SQL block that will display the ID, name, dept_name  and tot_cred  of 
+the first 10 students with lowest total credit.   
+
+DECLARE
+    CURSOR c1 IS
+        SELECT ID, name, dept_name, tot_cred
+        FROM student
+        ORDER BY tot_cred ASC;
+
+    v_id       student.ID%TYPE;
+    v_name     student.name%TYPE;
+    v_dept     student.dept_name%TYPE;
+    v_cred     student.tot_cred%TYPE;
+
+BEGIN
+    OPEN c1;
+
+    LOOP
+        FETCH c1 INTO v_id, v_name, v_dept, v_cred;
+        EXIT WHEN c1%NOTFOUND OR c1%ROWCOUNT > 10;
+
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_id);
+        DBMS_OUTPUT.PUT_LINE('Name: ' || v_name);
+        DBMS_OUTPUT.PUT_LINE('Dept: ' || v_dept);
+        DBMS_OUTPUT.PUT_LINE('Tot_Cred: ' || v_cred);
+        DBMS_OUTPUT.PUT_LINE('---------------------------');
+
+    END LOOP;
+
+    CLOSE c1;
+END;
+/
+
+
+3.Print the Course details and the total number of students registered for each course 
+along with the course details - (Course-id, title, dept-name, credits, 
+instructor_name, building, room-number, time-slot-id, tot_student_no ) 
+
+DECLARE
+    CURSOR c1 IS
+        SELECT c.course_id, c.title, c.dept_name, c.credits,
+               i.name, s.building, s.room_number, s.time_slot_id,
+               COUNT(t.ID) tot_student_no
+        FROM course c, section s, teaches te, instructor i, takes t
+        WHERE c.course_id = s.course_id
+        AND s.course_id = te.course_id
+        AND s.sec_id = te.sec_id
+        AND s.semester = te.semester
+        AND s.year = te.year
+        AND te.ID = i.ID
+        AND s.course_id = t.course_id(+)
+        AND s.sec_id = t.sec_id(+)
+        AND s.semester = t.semester(+)
+        AND s.year = t.year(+)
+        GROUP BY c.course_id, c.title, c.dept_name, c.credits,
+                 i.name, s.building, s.room_number, s.time_slot_id;
+
+BEGIN
+    FOR rec IN c1
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Course ID: ' || rec.course_id);
+        DBMS_OUTPUT.PUT_LINE('Title: ' || rec.title);
+        DBMS_OUTPUT.PUT_LINE('Dept: ' || rec.dept_name);
+        DBMS_OUTPUT.PUT_LINE('Credits: ' || rec.credits);
+        DBMS_OUTPUT.PUT_LINE('Instructor: ' || rec.name);
+        DBMS_OUTPUT.PUT_LINE('Building: ' || rec.building);
+        DBMS_OUTPUT.PUT_LINE('Room: ' || rec.room_number);
+        DBMS_OUTPUT.PUT_LINE('Time Slot: ' || rec.time_slot_id);
+        DBMS_OUTPUT.PUT_LINE('Total Students: ' || rec.tot_student_no);
+        DBMS_OUTPUT.PUT_LINE('-----------------------------');
+    END LOOP;
+END;
+/
+
+
+4. Find all students who take the course with Course-id: CS101 and if he/ she has 
+less than 30 total credit (tot-cred), deregister the student from that course. (Delete 
+the entry in Takes table)  
+
+DECLARE
+    CURSOR c1 IS
+        SELECT t.ID
+        FROM takes t, student s
+        WHERE t.ID = s.ID
+        AND t.course_id = 'CS101'
+        AND s.tot_cred < 30
+        FOR UPDATE;
+
+BEGIN
+    FOR rec IN c1
+    LOOP
+        DELETE FROM takes
+        WHERE CURRENT OF c1;
+    END LOOP;
+
+    COMMIT;
+END;
+/
+
+
+5. Alter StudentTable(refer Lab No. 8 Exercise) by resetting column LetterGrade to 
+F. Then write a PL/SQL block  to update the table by mapping GPA to the 
+corresponding letter grade for each student.  
+
+ALTER TABLE StudentTable ADD LetterGrade VARCHAR2(2);
+UPDATE StudentTable SET LetterGrade = 'F';
+COMMIT;
+
+DECLARE
+    CURSOR c1 IS
+        SELECT GPA
+        FROM StudentTable
+        FOR UPDATE;
+
+BEGIN
+    FOR rec IN c1
+    LOOP
+        IF rec.GPA >= 9 THEN
+            UPDATE StudentTable
+            SET LetterGrade = 'A'
+            WHERE CURRENT OF c1;
+        ELSIF rec.GPA >= 8 THEN
+            UPDATE StudentTable
+            SET LetterGrade = 'B'
+            WHERE CURRENT OF c1;
+        ELSIF rec.GPA >= 7 THEN
+            UPDATE StudentTable
+            SET LetterGrade = 'C'
+            WHERE CURRENT OF c1;
+        ELSIF rec.GPA >= 6 THEN
+            UPDATE StudentTable
+            SET LetterGrade = 'D'
+            WHERE CURRENT OF c1;
+        ELSE
+            UPDATE StudentTable
+            SET LetterGrade = 'F'
+            WHERE CURRENT OF c1;
+        END IF;
+    END LOOP;
+
+    COMMIT;
+END;
+/
+
+
+6. Write a PL/SQL block to print the list of Instructors teaching a specified course. 
+DECLARE
+    CURSOR c1(p_course course.course_id%TYPE) IS
+        SELECT i.ID, i.name, i.dept_name, i.salary
+        FROM instructor i, teaches t
+        WHERE i.ID = t.ID
+        AND t.course_id = p_course;
+
+BEGIN
+    FOR rec IN c1('CS101')
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || rec.ID);
+        DBMS_OUTPUT.PUT_LINE('Name: ' || rec.name);
+        DBMS_OUTPUT.PUT_LINE('Dept: ' || rec.dept_name);
+        DBMS_OUTPUT.PUT_LINE('Salary: ' || rec.salary);
+        DBMS_OUTPUT.PUT_LINE('---------------------------');
+    END LOOP;
+END;
+/
+
+
+7. Write a PL/SQL block to list the students who have registered for a course taught 
+by his/her advisor.   
+DECLARE
+    CURSOR c1(p_course course.course_id%TYPE) IS
+        SELECT s.ID, s.name, s.dept_name, s.tot_cred
+        FROM student s, takes t, advisor a, teaches te
+        WHERE s.ID = t.ID
+        AND s.ID = a.s_ID
+        AND a.i_ID = te.ID
+        AND t.course_id = te.course_id
+        AND t.course_id = p_course;
+
+BEGIN
+    FOR rec IN c1('CS101')
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || rec.ID);
+        DBMS_OUTPUT.PUT_LINE('Name: ' || rec.name);
+        DBMS_OUTPUT.PUT_LINE('Dept: ' || rec.dept_name);
+        DBMS_OUTPUT.PUT_LINE('Tot_Cred: ' || rec.tot_cred);
+        DBMS_OUTPUT.PUT_LINE('---------------------------');
+    END LOOP;
+END;
+/
