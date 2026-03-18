@@ -1,0 +1,202 @@
+Q1. Procedure to display “Good Day to You”
+
+CREATE OR REPLACE PROCEDURE good_day_proc IS
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Good Day to You');
+END;
+/
+
+SET SERVEROUTPUT ON;
+BEGIN
+    good_day_proc;
+END;
+/
+
+Q2. Procedure: List instructors & courses of a department
+
+CREATE OR REPLACE PROCEDURE dept_details(p_dept VARCHAR2) IS
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Instructors in ' || p_dept || ':');
+
+    FOR i IN (
+        SELECT name FROM instructor WHERE dept_name = p_dept
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(i.name);
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('Courses in ' || p_dept || ':');
+
+    FOR c IN (
+        SELECT course_id, title FROM course WHERE dept_name = p_dept
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(c.course_id || ' - ' || c.title);
+    END LOOP;
+END;
+/
+
+BEGIN
+    dept_details('Comp. Sci.');
+END;
+/
+
+Q3. Procedure to find most popular course per department
+
+CREATE OR REPLACE PROCEDURE course_popular(p_dept VARCHAR2) IS
+    v_course_id course.course_id%TYPE;
+BEGIN
+    SELECT course_id INTO v_course_id
+    FROM (
+        SELECT c.course_id, COUNT(*) cnt
+        FROM takes t
+        JOIN course c ON t.course_id = c.course_id
+        WHERE c.dept_name = p_dept
+        GROUP BY c.course_id
+        ORDER BY cnt DESC
+    )
+    WHERE ROWNUM = 1;
+
+    DBMS_OUTPUT.PUT_LINE('Most popular course in ' || p_dept || ' is ' || v_course_id);
+END;
+/
+
+BEGIN
+    course_popular('Comp. Sci.');
+END;
+/
+
+
+Q4. Students & courses of a department
+
+CREATE OR REPLACE PROCEDURE student_dept(p_dept VARCHAR2) IS
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Students in ' || p_dept || ':');
+
+    FOR s IN (
+        SELECT name FROM student WHERE dept_name = p_dept
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(s.name);
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('Courses in ' || p_dept || ':');
+
+    FOR c IN (
+        SELECT title FROM course WHERE dept_name = p_dept
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(c.title);
+    END LOOP;
+END;
+/
+
+BEGIN
+    student_dept('Physics');
+END;
+/
+
+Q5. Function: Square of a number
+
+CREATE OR REPLACE FUNCTION square_num(n NUMBER)
+RETURN NUMBER IS
+BEGIN
+    RETURN n * n;
+END;
+/
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(square_num(6));
+END;
+/
+
+
+Q6. Highest paid instructor in a department
+
+CREATE OR REPLACE FUNCTION department_highest(p_dept VARCHAR2)
+RETURN VARCHAR2 IS
+    v_name instructor.name%TYPE;
+BEGIN
+    SELECT name INTO v_name
+    FROM instructor
+    WHERE dept_name = p_dept
+    AND salary = (SELECT MAX(salary)
+                  FROM instructor
+                  WHERE dept_name = p_dept);
+
+    RETURN v_name;
+END;
+/
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(department_highest('Physics'));
+END;
+/
+
+Q7. Package (procedure + function)
+
+CREATE OR REPLACE PACKAGE dept_pkg AS
+    PROCEDURE list_instructors(p_dept VARCHAR2);
+    FUNCTION max_salary(p_dept VARCHAR2) RETURN NUMBER;
+END dept_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY dept_pkg AS
+
+    PROCEDURE list_instructors(p_dept VARCHAR2) IS
+    BEGIN
+        FOR i IN (
+            SELECT name FROM instructor WHERE dept_name = p_dept
+        ) LOOP
+            DBMS_OUTPUT.PUT_LINE(i.name);
+        END LOOP;
+    END;
+
+    FUNCTION max_salary(p_dept VARCHAR2) RETURN NUMBER IS
+        v_sal NUMBER;
+    BEGIN
+        SELECT MAX(salary) INTO v_sal
+        FROM instructor
+        WHERE dept_name = p_dept;
+
+        RETURN v_sal;
+    END;
+
+END dept_pkg;
+/
+
+BEGIN
+    dept_pkg.list_instructors('Finance');
+    DBMS_OUTPUT.PUT_LINE('Max Salary: ' || dept_pkg.max_salary('Finance'));
+END;
+/
+
+
+Q8. Procedure: Simple & Compound Interest
+
+CREATE OR REPLACE PROCEDURE interest_calc(
+    p_principal IN NUMBER,
+    p_rate IN NUMBER,
+    p_time IN NUMBER,
+    simple OUT NUMBER,
+    compound OUT NUMBER,
+    total IN OUT NUMBER
+) IS
+BEGIN
+    simple := (p_principal * p_rate * p_time) / 100;
+
+    compound := p_principal * POWER((1 + p_rate/100), p_time) - p_principal;
+
+    total := p_principal + compound;
+END;
+/
+
+DECLARE
+    si NUMBER;
+    ci NUMBER;
+    total NUMBER := 1000;
+BEGIN
+    interest_calc(1000, 10, 2, si, ci, total);
+
+    DBMS_OUTPUT.PUT_LINE('Simple Interest: ' || si);
+    DBMS_OUTPUT.PUT_LINE('Compound Interest: ' || ci);
+    DBMS_OUTPUT.PUT_LINE('Total Amount: ' || total);
+END;
+/
+
