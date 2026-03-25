@@ -1,0 +1,170 @@
+1. Based on the University database Schema in Lab 2, write a row trigger that records 
+along with the time any change made in the Takes (ID, course-id, sec-id, semester, 
+year, grade) table in log_change_Takes (Time_Of_Change, ID, courseid,sec-id, 
+semester, year, grade). 
+
+CREATE TABLE log_change_takes (
+    time_of_change DATE,
+    id VARCHAR2(5),
+    course_id VARCHAR2(10),
+    sec_id VARCHAR2(5),
+    semester VARCHAR2(10),
+    year NUMBER,
+    grade VARCHAR2(2)
+);
+
+CREATE OR REPLACE TRIGGER trg_log_takes
+AFTER INSERT OR UPDATE OR DELETE ON takes
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        INSERT INTO log_change_takes
+        VALUES (SYSDATE, :NEW.id, :NEW.course_id, :NEW.sec_id,
+                :NEW.semester, :NEW.year, :NEW.grade);
+
+    ELSIF UPDATING THEN
+        INSERT INTO log_change_takes
+        VALUES (SYSDATE, :NEW.id, :NEW.course_id, :NEW.sec_id,
+                :NEW.semester, :NEW.year, :NEW.grade);
+
+    ELSIF DELETING THEN
+        INSERT INTO log_change_takes
+        VALUES (SYSDATE, :OLD.id, :OLD.course_id, :OLD.sec_id,
+                :OLD.semester, :OLD.year, :OLD.grade);
+    END IF;
+END;
+/
+
+UPDATE takes
+SET grade = 'A+'
+WHERE id = '12345' AND course_id = 'CS-101';
+
+SELECT * FROM log_change_takes;
+
+
+Q2. Write a row trigger to store old values of Instructor(ID, name, dept_name, salary) into old_data_instructor when salary is updated.
+
+CREATE TABLE old_data_instructor (
+    id VARCHAR2(5),
+    name VARCHAR2(20),
+    dept_name VARCHAR2(20),
+    salary NUMBER
+);
+
+CREATE OR REPLACE TRIGGER trg_backup_instructor
+BEFORE UPDATE OF salary ON instructor
+FOR EACH ROW
+BEGIN
+    INSERT INTO old_data_instructor
+    VALUES (:OLD.id, :OLD.name, :OLD.dept_name, :OLD.salary);
+END;
+/
+
+UPDATE instructor SET salary = salary + 5000 WHERE id='10101';
+
+SELECT * FROM old_data_instructor;
+
+Q3. Create a trigger on Instructor to ensure:Name contains only alphabets, Salary > 0, Salary ≤ department budget
+
+CREATE OR REPLACE TRIGGER trg_validate_instructor
+BEFORE INSERT OR UPDATE ON instructor
+FOR EACH ROW
+DECLARE
+    dept_budget NUMBER;
+BEGIN
+    -- Name validation
+    IF NOT REGEXP_LIKE(:NEW.name, '^[A-Za-z ]+$') THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Invalid Name');
+    END IF;
+
+    -- Salary check
+    IF :NEW.salary <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Salary must be positive');
+    END IF;
+
+    -- Budget check
+    SELECT budget INTO dept_budget
+    FROM department
+    WHERE dept_name = :NEW.dept_name;
+
+    IF :NEW.salary > dept_budget THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Salary exceeds department budget');
+    END IF;
+END;
+/
+
+INSERT INTO instructor VALUES ('99999', 'John123', 'Comp. Sci.', 50000);
+
+
+Q4. Create an audit system for client_master(client_no, name, address, bal_due), Store deleted/updated records in
+auditclient(client_no, name, bal_due, operation, userid, opdate).
+
+CREATE TABLE client_master (
+    client_no VARCHAR2(10),
+    name VARCHAR2(20),
+    address VARCHAR2(50),
+    bal_due NUMBER
+);
+INSERT INTO client_master VALUES ('C1', 'Ram', 'Udupi', 5000);
+INSERT INTO client_master VALUES ('C2', 'Shyam', 'Mangalore', 3000);
+CREATE TABLE auditclient (
+    client_no VARCHAR2(10),
+    name VARCHAR2(20),
+    bal_due NUMBER,
+    operation VARCHAR2(10),
+    userid VARCHAR2(20),
+    opdate DATE
+);
+
+CREATE OR REPLACE TRIGGER trg_audit_client
+BEFORE DELETE OR UPDATE ON client_master
+FOR EACH ROW
+DECLARE
+    v_operation VARCHAR2(10);
+BEGIN
+    IF DELETING THEN
+        v_operation := 'DELETE';
+    ELSIF UPDATING THEN
+        v_operation := 'UPDATE';
+    END IF;
+
+    INSERT INTO auditclient
+    VALUES (
+        :OLD.client_no,
+        :OLD.name,
+        :OLD.bal_due,
+        v_operation,
+        USER,
+        SYSDATE
+    );
+END;
+/
+
+UPDATE client_master
+SET bal_due = 7000
+WHERE client_no = 'C1';
+
+DELETE FROM client_master
+WHERE client_no = 'C2';
+
+SELECT * FROM auditclient;
+
+Q5. Create a view advisor_student using Advisor ⨝ Student ⨝ Instructor. Enable DELETE on the view using INSTEAD OF trigger (delete from advisor).
+
+CREATE VIEW advisor_student AS
+SELECT a.s_id, a.i_id, s.name AS student_name, i.name AS instructor_name
+FROM advisor a
+JOIN student s ON a.s_id = s.id
+JOIN instructor i ON a.i_id = i.id;
+
+CREATE OR REPLACE TRIGGER trg_delete_advisor
+INSTEAD OF DELETE ON advisor_student
+FOR EACH ROW
+BEGIN
+    DELETE FROM advisor
+    WHERE s_id = :OLD.s_id
+    AND i_id = :OLD.i_id;
+END;
+/
+
+DELETE FROM advisor_student WHERE s_id='12345';
