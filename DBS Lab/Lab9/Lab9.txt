@@ -12,7 +12,10 @@ BEGIN
 END;
 /
 
-Q2. Procedure: List instructors & courses of a department
+Q2. Based on the University Database Schema in Lab 2, write a procedure which takes 
+the dept_name as input parameter and lists all the instructors  associated with the 
+department as well as list all the courses offered by the department. Also, write an 
+anonymous block with the procedure call. 
 
 CREATE OR REPLACE PROCEDURE dept_details(p_dept VARCHAR2) IS
 BEGIN
@@ -39,7 +42,10 @@ BEGIN
 END;
 /
 
-Q3. Procedure to find most popular course per department
+Q3. Based on the University Database Schema in Lab 2, write a Pl/Sql block of code 
+that lists the most popular course (highest number of students take it) for each of 
+the departments. It should make use of a procedure course_popular which finds 
+the most popular course in the given department. 
 
 CREATE OR REPLACE PROCEDURE course_popular(p_dept VARCHAR2) IS
     v_course_id course.course_id%TYPE;
@@ -65,7 +71,10 @@ END;
 /
 
 
-Q4. Students & courses of a department
+Q4. Based on the University Database Schema in Lab 2, write a procedure which takes 
+the dept-name as input parameter and lists all the students associated with the 
+department as well as list all the courses offered by the department. Also, write an 
+anonymous block with the procedure call.
 
 CREATE OR REPLACE PROCEDURE student_dept(p_dept VARCHAR2) IS
 BEGIN
@@ -92,7 +101,8 @@ BEGIN
 END;
 /
 
-Q5. Function: Square of a number
+Q5. Write a function to return the Square of a given number and call it from an    
+anonymous block. 
 
 CREATE OR REPLACE FUNCTION square_num(n NUMBER)
 RETURN NUMBER IS
@@ -107,7 +117,10 @@ END;
 /
 
 
-Q6. Highest paid instructor in a department
+Q6. Based on the University Database Schema in Lab 2, write a Pl/Sql block of code 
+that lists the highest paid Instructor in each of the Department. It should make use 
+of a function department_highest which returns the highest paid Instructor for the 
+given branch.
 
 CREATE OR REPLACE FUNCTION department_highest(p_dept VARCHAR2)
 RETURN VARCHAR2 IS
@@ -129,7 +142,11 @@ BEGIN
 END;
 /
 
-Q7. Package (procedure + function)
+Q7. Based on the University Database Schema in Lab 2, create a package to include 
+the following: 
+a) A named procedure to list the instructor_names of given department 
+b) A function which returns the max salary for the given department 
+c) Write a PL/SQL block to demonstrate the usage of above package components 
 
 CREATE OR REPLACE PACKAGE dept_pkg AS
     PROCEDURE list_instructors(p_dept VARCHAR2);
@@ -168,7 +185,10 @@ END;
 /
 
 
-Q8. Procedure: Simple & Compound Interest
+Q8. Write a PL/SQL procedure to return simple and compound interest (OUT 
+parameters) along with the Total Sum (IN OUT) i.e. Sum of Principle and Interest 
+taking as input the principle, rate of interest and number of years (IN parameters). 
+Call this procedure from an anonymous block.
 
 CREATE OR REPLACE PROCEDURE interest_calc(
     p_principal IN NUMBER,
